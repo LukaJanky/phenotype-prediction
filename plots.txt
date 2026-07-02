@@ -1,0 +1,218 @@
+import numpy as np
+import pickle
+import matplotlib.pyplot as plt
+
+
+def grafice_modele(fisier, power):
+    with open(fisier, 'rb') as file:
+        var = pickle.load(file)
+    if power != 'no_reg':
+        alfa = pow(10, power)
+    else:
+        alfa = 0
+    total_loss = var['total_loss']
+    test_total_loss = var['test_total_loss']
+    acc = var['acc']
+    test_acc = var['test_acc']
+    norm_go = var['norm_go']
+    norm_no_go = var['norm_no_go']
+
+    fig, axs = plt.subplots(3)
+    fig.tight_layout(h_pad=2)
+    axs[0].plot(acc, color='r', label='Training')
+    axs[0].plot(test_acc, color='b', label='Validation')
+    axs[0].set_xlabel("Number of epochs")
+    axs[0].set_ylabel("Accuracy[%]")
+    axs[0].set_title("Accuracy evolution " + chr(945) + " = " + str(alfa))
+    axs[0].legend()
+
+    axs[1].plot(total_loss, color='r', label='Training')
+    axs[1].plot(test_total_loss, color='b', label='Validation')
+    axs[1].set_xlabel("Number of epochs")
+    axs[1].set_ylabel("Loss")
+    axs[1].set_title("Loss evolution " + chr(945) + " = " + str(alfa))
+    axs[1].legend()
+
+    axs[2].plot(norm_go, color='r', label='GO Connexions')
+    axs[2].plot(norm_no_go, color='b', label='noGO Connexions')
+    axs[2].set_xlabel("Number of epochs")
+    axs[2].set_ylabel("Norm")
+    axs[2].set_title("Norm evolution " + chr(945) + " = " + str(alfa))
+    axs[2].legend()
+    plt.show()
+    return 0
+
+
+def grafice_date_reale(set):
+    if set == 'training':
+        loaded = np.load('X_train.npz')
+    elif set == 'validation':
+        loaded = np.load('X_test.npz')
+    elif set == 'prediction':
+        loaded = np.load('X_prediction.npz')
+    y = loaded['y']
+    y = y.reshape(-1, 1)
+    plt.plot(y, 'o', label='real data')
+    plt.xlabel('Pacient ID')
+    plt.ylabel('Diagnostic (1-cancer 0-normal)')
+    plt.title('Real data distribution (' + str(set) + ')')
+    #plt.legend()
+    plt.show()
+    return 0
+
+
+def grafice_predictie(stare):
+    ac = 0
+    ac1 = 0
+    loaded = np.load('X_prediction.npz')
+    y = loaded['y']
+    y = y.reshape(-1, 1)
+    loaded2 = np.load('y_test_hat.npz')
+    y_hat = loaded2['y_hat']
+    y_hat = y_hat.reshape(1, -1)
+    y_hat = list(y_hat)
+    y_hat = np.array(y_hat)
+    y_hat = np.transpose(y_hat)
+    for i in range(0, y.size):
+        if y[i] == y_hat[i]:
+            ac = ac + 1
+
+    acc = ac/y.size
+    if stare == 'sick':
+        y = y[0:887]
+        y_hat = y_hat[0:887]  # 0:1300
+        for i in range(0, y.size):
+            if y[i] == y_hat[i]:
+                ac1 = ac1 + 1
+        acc1 = ac1/y.size
+    elif stare == 'healthy':
+        y = y[887:1365]
+        y_hat = y_hat[887:1365]  # 1300:2000
+        for i in range(0, y.size):
+            if y[i] == y_hat[i]:
+                ac1 = ac1 + 1
+        acc1 = ac1 / y.size
+    # print('\n')
+    # print(y_hat)
+    # print('\n')
+    # print(y_hat.size)
+    plt.plot(y, 'o',  label='real data')
+    plt.plot(y_hat, 'o', label='estimated data', color='orange')
+    plt.xlabel('Pacient ID')
+    plt.ylabel('Diagnostic (1-cancer 0-normal)')
+    plt.title('Estimated data vs real data (' + str(stare)+' pacients)') #Distributia datelor reale si a celor estimate
+    plt.legend()
+    print('Model prediction accuracy: ', acc)
+    print('Model prediction error: ', 1-acc)
+    print('Correct predictions: ', ac1, '/', y.size)
+    print('Prediction accuracy for ' + str(stare), ' pacients: ', acc1)
+    print('Prediction error for ' + str(stare), ' pacients: ', 1-acc1)
+    plt.show()
+    return 0
+
+
+def grafice_erori_pred(er_stare):
+    loaded = np.load('X_prediction.npz')
+    y = loaded['y']
+    y = y.reshape(-1, 1)
+    loaded2 = np.load('y_test_hat.npz')
+    y_hat = loaded2['y_hat']
+    y_hat = y_hat.reshape(1, -1)
+    y_hat = list(y_hat)
+    y_hat = np.array(y_hat)
+    y_hat = np.transpose(y_hat)
+
+    if er_stare == 'sick':
+        y = y[0:887]  # 0:1300
+        y_hat = y_hat[0:887]
+        a = y_hat - y
+    elif er_stare == 'healthy':
+        y = y[887:1365]  # 0:1365
+        y_hat = y_hat[887:1365]
+        a = y - y_hat
+
+    plt.plot(a, label='real data')
+    plt.xlabel('Pacient ID')
+    plt.ylabel('Diagnostic (1-cancer 0-normal)')
+    plt.title('Prediction errors for ' + str(
+        er_stare)+ ' pacients')
+    # plt.legend()
+    plt.show()
+    return 0
+
+print('1. Classic MLP Model, ' + chr(945) + ' = 0')
+print('2. Self-explainable Model, ' + chr(945) + ' = 0.01')
+print('3. Self-explainable Model, ' + chr(945) + ' = 0.001')
+print('4. Self-explainable Model, ' + chr(945) + ' = 0.0001')
+print('5. Self-explainable Model, ' + chr(945) + ' = 0.00001')
+op = input('Chose a model to evaluate its performances: ')
+
+match op:
+    case '1':
+        fisier00 = 'histories_0.txt'
+        power00 = 'no_reg'
+        grafice_modele(fisier00, power00)
+    case '2':
+        fisier2 = 'histories_1e-2.txt'
+        power2 = -2
+        grafice_modele(fisier2, power2)
+    case '3':
+        fisier3 = 'histories_1e-3.txt'
+        power3 = -3
+        grafice_modele(fisier3, power3)
+    case '4':
+        fisier4 = 'histories_1e-4.txt'
+        power4 = -4
+        grafice_modele(fisier4, power4)
+    case '5':
+        fisier5 = 'histories_1e-5.txt'
+        power5 = -5
+        grafice_modele(fisier5, power5)
+    case 'pass':
+        print('\n')
+
+print('1. Training dataset')
+print('2. Validation dataset')
+print('3. Prediction dataset')
+rl = input('Chose a dataset to display its distribution: ')
+
+match rl:
+    case '1':
+        set = 'training'
+        grafice_date_reale(set)
+    case '2':
+        set = 'validation'
+        grafice_date_reale(set)
+    case '3':
+        set = 'prediction'
+        grafice_date_reale(set)
+    case 'pass':
+        print('\n')
+
+print('1. Sick patients predictions')
+print('2. Healthy patients predictions')
+gf = input('Chose a patient category to evaluate prediction: ')
+
+match gf:
+    case '1':
+        stare = 'sick'
+        grafice_predictie(stare)
+    case '2':
+        stare = 'healthy'
+        grafice_predictie(stare)
+    case 'pass':
+        print('\n')
+
+print('1. Prediction errors for sick patients')
+print('2. Prediction errors for healthy patients')
+gf = input('Chose the prediction errors you want to display: ')
+
+match gf:
+    case '1':
+        er_stare = 'sick'
+        grafice_erori_pred(er_stare)
+    case '2':
+        er_stare = 'healthy'
+        grafice_erori_pred(er_stare)
+    case 'pass':
+        print('\n')

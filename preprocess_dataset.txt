@@ -1,0 +1,232 @@
+import statistics as st
+import numpy as np
+with open("proces_extracted3.txt", 'r') as fp:
+    elem_line = 6000
+    total = 54675
+    maxim = [0] * total
+    minim = [0] * total
+    med = [0] * total
+    # line_numbers = [1]
+    line_numbers = list(range(0, total))
+    lines = []
+    for i, line in enumerate(fp):
+        if i in line_numbers:
+            lines.append(line.strip())
+            linie_string = lines[0].split()[0:elem_line]
+            num_list = [float(j) for j in linie_string]
+            maxim[i-1] = maxim[i-1] + max(num_list)
+            minim[i-1] = minim[i-1] + min(num_list)
+            med[i-1] = med[i-1] + st.mean(num_list)
+            lines.clear()
+        elif i > total + 1:
+            break
+with open('maxim.txt', 'w') as f1:
+    f1.write(str(maxim))
+with open('minim.txt', 'w') as f2:
+    f2.write(str(minim))
+with open('media.txt', 'w') as f3:
+    f3.write(str(med))
+# print(num_list)
+# print('\n')
+# print(med)
+
+
+
+
+
+
+
+
+import statistics as st
+import numpy as np
+lines = []
+line_numbers = [0]
+# same for maxim and minim
+with open('media.txt', 'r') as fp:
+    for i, line in enumerate(fp):
+        if i in line_numbers:
+            lines.append(line.strip())
+            linie_string = lines[0].split(',')
+            num_list = [float(j) for j in linie_string]
+            med = st.mean(num_list)
+print(num_list)
+print('\n')
+print(med)
+
+
+
+
+
+
+
+
+
+
+import statistics as st
+import numpy as np
+with open("proces_extracted2.txt", 'r') as fp:
+    elem_line = 6000
+    total = 54675
+    med = 5.687186315830404
+    dev = 1
+    # line_numbers = [1]
+    line_numbers = list(range(0, total))
+    lines = []
+    for i, line in enumerate(fp):
+        if i in line_numbers:
+            lines.append(line.strip())
+            linie_string = lines[0].split()[0:elem_line]
+            num_list = [float(j) for j in linie_string]
+            res = [(a - med)/dev for a in num_list]
+            s = ", ".join(map(str, res))
+            # s = s.replace(',', '') after importing, replace ',' with ''
+            lines.clear()
+            with open('processed_normalized.txt', 'a') as p:
+                p.write(str(s + "\n"))
+        elif i > total + 1:
+            break
+# print(s)
+# print('\n')
+# print(med)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import statistics as st
+import numpy as np
+with open("processed_normalized.txt", 'r') as fp:
+    elem_line = 6000  # 3900(2535+1365) 2100(1365+735)
+    total = 54675     # 2535(1648+887) 1365(887+478)
+    dev = 1
+    # line_numbers = [1]
+    line_numbers = list(range(0, total))
+    lines = []
+    for i, line in enumerate(fp):
+        if i in line_numbers:
+            lines.append(line.strip())
+            linie_string = lines[0].split(',')[0:elem_line]
+            num_list = [float(j) for j in linie_string]
+            a1 = num_list[0:2535]
+            g1 = num_list[3900:5265]
+            res1 = np.concatenate([a1, g1])
+            a2 = num_list[2535:3900]
+            g2 = num_list[5265:elem_line]
+            res2 = np.concatenate([a2, g2])
+            s1 = ", ".join(map(str, res1))
+            s1 = s1.replace(',', '')
+            s2 = ", ".join(map(str, res2))
+            s2 = s2.replace(',', '')
+            lines.clear()
+            with open('X_train.txt', 'a') as p1:
+                p1.write(str(s1 + "\n"))
+            with open('X_test.txt', 'a') as p2:
+                p2.write(str(s2 + "\n"))
+        elif i > total:
+            break
+print(len(res1))
+print('\n')
+print(len(res2))
+
+
+
+
+
+
+
+
+
+
+import statistics as st
+import numpy as np
+with open("X_train.txt", 'r') as fp:
+    elem_test = 2100
+    elem_train = 3900
+    total = 54675
+    can = 2535
+    no_can = 1365
+    # line_numbers = [1]
+    line_numbers = list(range(0, total))
+    lines = []
+    linie_string = []
+    num_list = []
+    for i, line in enumerate(fp):
+        if i in line_numbers:
+            lines.append(line.strip())
+            linie_string.append(lines[i].split()[0:elem_train])
+            num_list.append([float(j) for j in linie_string[i]])
+        elif i > total:
+            break
+    arr_can = [1] * can
+    arr_no_can = [0] * no_can
+    y_train = np.append(arr_can, arr_no_can)
+    np.savez('train.npz', x=num_list, y=y_train)
+# with open('maxim.txt', 'w') as f1:
+    # f1.write(str(maxim))
+# print(data)
+# print('\n')
+# print(len(y_train))
+# print(len(num_list[0]))
+
+
+
+
+
+
+
+
+
+
+
+# Open the input and output files
+input_file = "E-MTAB-3732.sdrf.txt"  # Replace with your input file name
+output_file = "E-MTAB-3732.sdrf_filtered.txt"  # Replace with your desired output file name
+
+# Initialize counters and lists for cancer and no-cancer samples
+cancer_samples = []
+no_cancer_samples = []
+
+# Read the input file
+with open(input_file, "r") as infile:
+    # Read the header line
+    header = infile.readline()
+
+    # Process each line in the file
+    for line in infile:
+        # Check if the line contains the word "normal"
+        if "normal" in line.lower():
+            no_cancer_samples.append(line)
+        else:
+            cancer_samples.append(line)
+
+# Open the output file for writing
+with open(output_file, "w") as outfile:
+    # Write the header line
+    outfile.write(header)
+
+    # Write the first 3900 cancer samples
+    for i, sample in enumerate(cancer_samples[:3900], 1):
+        outfile.write(sample)
+        print(f"Appended {i} cancer sample(s)")
+
+    # Write the first 2100 no-cancer samples
+    for i, sample in enumerate(no_cancer_samples[:2100], 1):
+        outfile.write(sample)
+        print(f"Appended {i} no-cancer sample(s)")
+
+# Calculate the total lines appended
+total_lines_appended = len(cancer_samples[:3900]) + len(no_cancer_samples[:2100])
+
+print(f"Processing complete. Output written to {output_file}")
+print(f"Total lines appended: {total_lines_appended}")

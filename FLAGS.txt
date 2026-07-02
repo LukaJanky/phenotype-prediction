@@ -1,0 +1,61 @@
+Deep_model.py:
+  --alpha: valoarea hiperparametrului alfa
+    (default: '1.0')
+    (a number)
+  --batch_size: numărul de eșantioane dintr-un lot
+    (default: '512')
+    (an integer)
+  --[no]bn: utilizarea loturilor
+    (default: 'false')
+    (default: '')
+  --display_step: afișare performanțe
+    (default: '5')
+    (an integer)
+  --epochs: numărul de epoci pentru învățare
+    (default: '20')
+    (an integer)
+  --[no]is_training: modelul poate învăța
+    (default: 'true')
+  --keep_prob: probabilitatea de renunțare
+    (default: '0.4')
+    (a number)
+  --learning_rate: rată de învățare
+    (default: '0.001')
+    (a number)
+  --log_dir: log_dir
+    (default: 'D:\\Licenta\\Python')
+  --lr_method: metoda de optimizare
+    (default: 'adam')
+  --n_classes: numărul de clase
+    (default: '1')
+    (an integer)
+  --n_hidden_1: numărul de neuroni pentru primul strat ascuns
+    (default: '1574')
+    (an integer)
+  --n_hidden_2: numărul de neuroni pentru al doilea strat ascuns
+    (default: '1386')
+    (an integer)
+  --n_hidden_3: numărul de neuroni pentru al treilea strat ascuns
+    (default: '951')
+    (an integer)
+  --n_hidden_4: numărul de neuroni pentru al patrulea strat ascuns
+    (default: '515')
+    (an integer)
+  --n_hidden_5: numărul de neuroni pentru al cincilea strat ascuns
+    (default: '255')
+    (an integer)
+  --n_hidden_6: numărul de neuroni pentru al șaselea strat ascuns
+    (default: '90')
+    (an integer)
+  --n_input: numărul de trăsături
+    (default: '54675')
+    (an integer)
+  --n_layers: numărul de straturi
+    (default: '6')
+    (an integer)
+  --processing: alegerea funcției {train,evaluate,predict}
+    (default: 'train')
+  --[no]save: salvare model
+    (default: 'false')
+  --type_training: termen de regularizare
+    (default: 'LGO')

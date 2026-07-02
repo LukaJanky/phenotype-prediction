@@ -10,6 +10,7 @@ Use Guide:
 
 
 python Deep_Model.py --type_training="LGO" --alpha=1e-3 --epochs=50 --is_training=True --display_step=1 --save=True --processing="train" --bn=True (netural networw with weight penalties)
+
 python Deep_Model.py --alpha=0 --epochs=50 --is_training=True --display_step=1 --save=True --processing="train" --bn=True (normal neural networks)
 
 ### 4) Run the evaluate function from 'Deep_model.py':
